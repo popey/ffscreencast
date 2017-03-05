@@ -1,0 +1,71 @@
+name: ffscreencast
+version: '0.6.1+git'
+summary: ffmpeg screencast with video overlay and multi monitor support
+description: |
+  ffscreencast is a shell wrapper for ffmpeg that allows fool-proof screen
+  recording via the command line. It will auto-detect all available monitors,
+  cameras and microphones and is able to interactively or manually choose the
+  desired recording device(s). Additionally ffscreencast will let you overlay
+  the camera stream on top of the desktop session..
+
+grade: stable
+confinement: strict
+
+apps:
+  ffscreencast:
+    command: bin/ffscreencast
+    plugs:
+      - pulseaudio
+      - x11
+      - process-control
+      - camera
+      - alsa
+
+parts:
+  libfdk-aac:
+    source: https://github.com/mstorsjo/fdk-aac.git
+    plugin: autotools
+  ffmpeg:
+    after: [libfdk-aac]
+    plugin: autotools
+    configflags: [--prefix=/usr, --enable-x11grab, --enable-libfdk-aac, --disable-ffplay, --disable-ffserver, --disable-ffprobe, --enable-gpl, --enable-libass, --enable-libfreetype, --enable-libmp3lame, --enable-libopus, --enable-libtheora, --enable-libvorbis, --enable-libvpx, --enable-libx264, --enable-libx265, --enable-nonfree]
+    source: git://source.ffmpeg.org/ffmpeg.git
+    source-type: git
+    build-packages:
+      - git
+      - g++
+      - make
+      - yasm
+      - autoconf
+      - libtool
+      - cmake
+      - pkg-config
+      - automake
+      - build-essential
+      - libass-dev
+      - libfreetype6-dev
+      - libsdl1.2-dev
+      - libtheora-dev
+      - libva-dev
+      - libvdpau-dev
+      - libvorbis-dev
+      - libxcb1-dev
+      - libxcb-shm0-dev
+      - libxcb-xfixes0-dev
+      - texinfo
+      - zlib1g-dev
+      - libx264-dev
+      - libmp3lame-dev
+      - libopus-dev
+      - libx265-dev
+      - libvpx-dev
+  ffscreencast:
+    after: [ffmpeg]
+    plugin: dump
+    source: .
+    stage-packages:
+#      - ffmpeg
+      - x11-utils
+      - alsa-utils
+      - v4l-utils
+      - libfaac0
